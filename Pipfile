@@ -8,6 +8,7 @@ django = "*"
 djangorestframework = "*"
 dj-database-url = "*"
 psycopg2 = "*"
+black = "*"
 
 [dev-packages]
 pytest-django = "*"
