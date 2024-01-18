@@ -20,16 +20,20 @@ logs:
 
 migrate:
 	@echo "Running migrations..."
-	@docker compose -f docker/compose-base.yml -f docker/compose-db.yml run --rm --build app python manage.py migrate
+	@docker compose -f docker/compose-base.yml -f docker/compose-db.yml run --rm app python manage.py migrate
 	$(warning Database keeps running after migrations, execute 'make down' to stop it)
 
 test:
 	@echo "Running tests..."
-	@docker compose  -f docker/compose-base.yml  run --rm --build app pytest
+	@docker compose  -f docker/compose-base.yml run --rm app pytest
 
 format:
 	@echo "Formatting code..."
-	@docker compose  -f docker/compose-base.yml run --rm --build app black .
+	@docker compose  -f docker/compose-base.yml run --rm app black .
+
+lint:
+	@echo "Linting code..."
+	@docker compose  -f docker/compose-base.yml run --rm app python -m flake8 .
 
 build-up: build up
 
