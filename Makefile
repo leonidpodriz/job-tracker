@@ -23,6 +23,10 @@ migrate:
 	@docker compose run --rm --build app python manage.py migrate
 	$(warning Database keeps running after migrations, execute 'make down' to stop it)
 
+test:
+	@echo "Running tests..."
+	@docker compose run --rm --build app pytest
+
 build-up: build up
 
 .PHONY: build up down restart logs migrate build-up
