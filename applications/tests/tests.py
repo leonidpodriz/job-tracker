@@ -41,7 +41,7 @@ def test_applications_create(user):
         'post': 'create',
     })
 
-    request = factory.post(APPLICATIONS_V1_URI, {})
+    request = factory.post(APPLICATIONS_V1_URI, {}, format='json')
     force_authenticate(request, user=user)
     response = view(request)
 
@@ -109,7 +109,11 @@ def test_applications_status_change(user, status_case):
     application_status = status_case['value']
     is_valid_expected = status_case['is_valid']
 
-    request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'status': application_status})
+    request = factory.patch(
+        APPLICATIONS_V1_URI + '{0}/'.format(application.id),
+        {'status': application_status},
+        format='json',
+    )
     force_authenticate(request, user=user)
     response = view(request, pk=application.id)
 
