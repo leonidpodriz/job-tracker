@@ -135,14 +135,25 @@ def test_applications_status_change(user, status_case):
         )
 
 
-def test_applications_notes(user):
+notes_cases = (
+    'some notes',
+    'some other notes',
+    'some other notes 123',
+    'some other notes 123 456',
+    'note with special characters: !@#$%^&*()_+{}[]|\\:;\"\'<>,.?/',
+    None,
+)
+
+
+@pytest.mark.parametrize('notes', notes_cases)
+def test_applications_notes(user, notes):
     application = Application.objects.create(user=user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view({
         'patch': 'partial_update',
     })
 
-    request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'notes': 'some notes'})
+    request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'notes': notes}, format='json')
     force_authenticate(request, user=user)
     response = view(request, pk=application.id)
 
@@ -152,7 +163,7 @@ def test_applications_notes(user):
         )
     )
 
-    assert response.data.get('notes') == 'some notes', (
+    assert response.data.get('notes') == notes, (
         'Response data does not contain `notes` field with value `some notes`.'
     )
 
