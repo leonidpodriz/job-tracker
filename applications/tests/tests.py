@@ -55,6 +55,16 @@ def test_applications_create(user):
         'Response data does not contain `user` field with correct `id`.'
     )
 
+    required_user_fields = {'username', 'first_name', 'last_name', 'email', 'is_active'}
+    response_user = response.data.get('user', {})
+    insufficient_fields = required_user_fields - set(response_user.keys())
+
+    assert not insufficient_fields, (
+        'Response data does not contain `user` field with required fields: {0}'.format(
+            ', '.join(insufficient_fields)
+        )
+    )
+
 
 def test_applications_list(user):
     factory = APIRequestFactory()
