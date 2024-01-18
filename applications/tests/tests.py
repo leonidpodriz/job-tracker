@@ -132,6 +132,28 @@ def test_applications_status_change(user):
             )
 
 
+def test_applications_notes(user):
+    application = Application.objects.create(user=user)
+    factory = APIRequestFactory()
+    view = ApplicationViewSet.as_view({
+        'patch': 'partial_update',
+    })
+
+    request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'notes': 'some notes'})
+    force_authenticate(request, user=user)
+    response = view(request, pk=application.id)
+
+    assert response.status_code == status.HTTP_200_OK, (
+        'Expected Response Code 200, received {0} instead.'.format(
+            response.status_code,
+        )
+    )
+
+    assert response.data.get('notes') == 'some notes', (
+        'Response data does not contain `notes` field with value `some notes`.'
+    )
+
+
 def test_applications_list(user):
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view({
