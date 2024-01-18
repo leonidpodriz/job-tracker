@@ -39,6 +39,8 @@ type-check:
 	@echo "Type checking code..."
 	@docker compose  -f docker/compose-base.yml run --rm app mypy .
 
+scan: lint type-check test
+
 build-up: build up
 
 .PHONY: build up down restart logs migrate build-up
