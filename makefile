@@ -35,6 +35,10 @@ lint:
 	@echo "Linting code..."
 	@docker compose  -f docker/compose-base.yml run --rm app python -m flake8 .
 
+type-check:
+	@echo "Type checking code..."
+	@docker compose  -f docker/compose-base.yml run --rm app mypy .
+
 build-up: build up
 
 .PHONY: build up down restart logs migrate build-up
