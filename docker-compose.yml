@@ -21,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - ENV=dev
     command: python manage.py runserver
     volumes:
       - .:/app
