@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:16.1-bullseye
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=app
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver
+    volumes:
+      - .:/app
+    ports:
+      - '8000:8000'
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=secret
+      - DJANGO_ALLOWED_HOSTS=localhost
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
