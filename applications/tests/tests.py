@@ -1,5 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
+
+from applications.models import Application
 from applications.views import ApplicationViewSet
 
 APPLICATIONS_V1_URI = '/api/v1/applications/'
@@ -68,6 +70,28 @@ def test_applications_create(user):
         'Response data does not contain `user` field with required fields: {0}'.format(
             ', '.join(insufficient_fields)
         )
+    )
+
+
+def test_applications_reject(user):
+    application = Application.objects.create(user=user)
+    factory = APIRequestFactory()
+    view = ApplicationViewSet.as_view({
+        'patch': 'partial_update',
+    })
+
+    request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'status': 'rejected'})
+    force_authenticate(request, user=user)
+    response = view(request, pk=application.id)
+
+    assert response.status_code == status.HTTP_200_OK, (
+        'Expected Response Code 200, received {0} instead.'.format(
+            response.status_code,
+        )
+    )
+
+    assert response.data.get('status') == 'rejected', (
+        'Response data does not contain `status` field with value `rejected`.'
     )
 
 
