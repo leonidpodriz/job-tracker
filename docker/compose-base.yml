@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - ENV=dev
+    command: python manage.py runserver
+    volumes:
+      - ..:/app
+    ports:
+      - '8000:8000'
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=secret
+      - DJANGO_ALLOWED_HOSTS=localhost
+
+volumes:
+  postgres_data:
