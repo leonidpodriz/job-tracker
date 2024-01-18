@@ -43,4 +43,4 @@ scan: lint type-check test
 
 build-up: build up
 
-.PHONY: build up down restart logs migrate build-up
+.PHONY: build up down restart logs migrate build-up test format lint type-check scan
