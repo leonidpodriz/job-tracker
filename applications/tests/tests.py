@@ -73,26 +73,63 @@ def test_applications_create(user):
     )
 
 
-def test_applications_reject(user):
+def test_applications_status_change(user):
     application = Application.objects.create(user=user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view({
         'patch': 'partial_update',
     })
-
-    request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'status': 'rejected'})
-    force_authenticate(request, user=user)
-    response = view(request, pk=application.id)
-
-    assert response.status_code == status.HTTP_200_OK, (
-        'Expected Response Code 200, received {0} instead.'.format(
-            response.status_code,
-        )
+    status_cases = (
+        {
+            'value': 'accepted',
+            'is_valid': True,
+        },
+        {
+            'value': 'rejected',
+            'is_valid': True,
+        },
+        {
+            'value': 'pending',
+            'is_valid': True,
+        },
+        {
+            'value': 'invalid',
+            'is_valid': False,
+        },
+        {
+            'value': 'some_random_status',
+            'is_valid': False,
+        },
     )
 
-    assert response.data.get('status') == 'rejected', (
-        'Response data does not contain `status` field with value `rejected`.'
-    )
+    for status_case in status_cases:
+        application_status = status_case['value']
+        is_valid_expected = status_case['is_valid']
+
+        request = factory.patch(APPLICATIONS_V1_URI + '{0}/'.format(application.id), {'status': application_status})
+        force_authenticate(request, user=user)
+        response = view(request, pk=application.id)
+
+        if is_valid_expected:
+            assert response.status_code == status.HTTP_200_OK, (
+                'Expected Response Code 200, received {0} instead. (Status: {1})'.format(
+                    response.status_code,
+                    application_status,
+                )
+            )
+
+            assert response.data.get('status') == application_status, (
+                'Response data does not contain `status` field with value `{0}`.'.format(
+                    application_status,
+                )
+            )
+        else:
+            assert response.status_code == status.HTTP_400_BAD_REQUEST, (
+                'Expected Response Code 400, received {0} instead. (Status: {1})'.format(
+                    response.status_code,
+                    application_status,
+                )
+            )
 
 
 def test_applications_list(user):
