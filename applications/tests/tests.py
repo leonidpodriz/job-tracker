@@ -51,8 +51,7 @@ def test_applications_create(user):
     assert 'id' in response.data, (
         'Response data does not contain `id` field.'
     )
-
-    assert response.get('user', {}).get('id') == user.id, (
+    assert response.data.get('user', {}).get('id') == user.id, (
         'Response data does not contain `user` field with correct `id`.'
     )
 
