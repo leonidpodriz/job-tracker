@@ -21,7 +21,7 @@ def test_unauthorized_requests():
         factory.delete(APPLICATIONS_V1_URI)
     ]
 
-    for request, args in requests:
+    for request in requests:
         response = view(request)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED, (
