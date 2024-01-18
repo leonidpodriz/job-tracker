@@ -1,4 +1,4 @@
-from rest_framework import status, routers
+from rest_framework import status
 from rest_framework.test import APIRequestFactory
 from applications.views import ApplicationViewSet
 
