@@ -32,6 +32,31 @@ def test_unauthorized_requests():
         )
 
 
+def test_applications_create(user):
+    factory = APIRequestFactory()
+    view = ApplicationViewSet.as_view({
+        'post': 'create',
+    })
+
+    request = factory.post(APPLICATIONS_V1_URI, {})
+    force_authenticate(request, user=user)
+    response = view(request)
+
+    assert response.status_code == status.HTTP_201_CREATED, (
+        'Expected Response Code 201, received {0} instead.'.format(
+            response.status_code,
+        )
+    )
+
+    assert 'id' in response.data, (
+        'Response data does not contain `id` field.'
+    )
+
+    assert response.get('user', {}).get('id') == user.id, (
+        'Response data does not contain `user` field with correct `id`.'
+    )
+
+
 def test_applications_list(user):
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view({
