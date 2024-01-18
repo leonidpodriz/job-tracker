@@ -41,8 +41,8 @@ def test_applications_list(user):
     })
 
     request = factory.get(APPLICATIONS_V1_URI)
-    response = view(request)
     force_authenticate(request, user=user)
+    response = view(request)
 
     assert response.status_code == status.HTTP_200_OK, (
         'Expected Response Code 200, received {0} instead.'.format(
