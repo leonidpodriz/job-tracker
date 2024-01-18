@@ -87,8 +87,13 @@ WSGI_APPLICATION = "job_tracker.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+DEFAULT_DATABASE_URL = None
+if DEBUG:
+    DEFAULT_DATABASE_URL = "sqlite:///db.sqlite3"
+
 DATABASES = {
     "default": dj_database_url.config(
+        default=DEFAULT_DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
     )
