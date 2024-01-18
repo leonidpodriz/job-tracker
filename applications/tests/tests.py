@@ -51,6 +51,11 @@ def test_applications_create(user):
     assert 'id' in response.data, (
         'Response data does not contain `id` field.'
     )
+
+    assert response.data.get('status') == 'pending', (
+        'Response data does not contain `status` field with value `pending`.'
+    )
+
     assert response.data.get('user', {}).get('id') == user.id, (
         'Response data does not contain `user` field with correct `id`.'
     )
