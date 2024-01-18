@@ -55,6 +55,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'job_tracker.authentication.SessionAuthentication',
+    ]
+}
+
 ROOT_URLCONF = 'job_tracker.urls'
 
 TEMPLATES = [
