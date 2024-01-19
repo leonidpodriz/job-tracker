@@ -16,3 +16,9 @@ class Application(models.Model):
         default=ApplicationStatus.PENDING,
     )
     notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        permissions = (
+            ("change_application_status", "Can change application status"),
+            ("change_application_notes", "Can change application notes"),
+        )

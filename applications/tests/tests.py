@@ -30,13 +30,43 @@ def test_unauthorized_requests():
         response = view(request)
 
         assert (
-            response.status_code == status.HTTP_401_UNAUTHORIZED
+                response.status_code == status.HTTP_401_UNAUTHORIZED
         ), "Expected Response Code 401, received {0} instead. (Method: {1})".format(
             response.status_code, request.method
         )
 
 
-def test_applications_create(user):
+def test_applications_operations_without_permissions(pure_user):
+    application = Application.objects.create(user=pure_user)
+    factory = APIRequestFactory()
+    view = ApplicationViewSet.as_view(
+        {
+            "get": "retrieve",
+            "put": "update",
+            "patch": "partial_update",
+            "delete": "destroy",
+        }
+    )
+
+    requests = [
+        factory.get(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
+        factory.put(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
+        factory.patch(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
+        factory.delete(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
+    ]
+
+    for request in requests:
+        force_authenticate(request, user=pure_user)
+        response = view(request, pk=application.id)
+
+        assert (
+                response.status_code == status.HTTP_403_FORBIDDEN
+        ), "Expected Response Code 403, received {0} instead. (Method: {1})".format(
+            response.status_code, request.method
+        )
+
+
+def test_applications_create(super_user):
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -45,11 +75,11 @@ def test_applications_create(user):
     )
 
     request = factory.post(APPLICATIONS_V1_URI, {}, format="json")
-    force_authenticate(request, user=user)
+    force_authenticate(request, user=super_user)
     response = view(request)
 
     assert (
-        response.status_code == status.HTTP_201_CREATED
+            response.status_code == status.HTTP_201_CREATED
     ), "Expected Response Code 201, received {0} instead.".format(
         response.status_code,
     )
@@ -57,11 +87,11 @@ def test_applications_create(user):
     assert "id" in response.data, "Response data does not contain `id` field."
 
     assert (
-        response.data.get("status") == "pending"
+            response.data.get("status") == "pending"
     ), "Response data does not contain `status` field with value `pending`."
 
     assert (
-        response.data.get("user", {}).get("id") == user.id
+            response.data.get("user", {}).get("id") == super_user.id
     ), "Response data does not contain `user` field with correct `id`."
 
     required_user_fields = {"username", "first_name", "last_name", "email", "is_active"}
@@ -100,8 +130,8 @@ status_cases = (
 
 
 @pytest.mark.parametrize("status_case", status_cases)
-def test_applications_status_change(user, status_case):
-    application = Application.objects.create(user=user)
+def test_applications_status_change(super_user, status_case):
+    application = Application.objects.create(user=super_user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -117,25 +147,25 @@ def test_applications_status_change(user, status_case):
         {"status": application_status},
         format="json",
     )
-    force_authenticate(request, user=user)
+    force_authenticate(request, user=super_user)
     response = view(request, pk=application.id)
 
     if is_valid_expected:
         assert (
-            response.status_code == status.HTTP_200_OK
+                response.status_code == status.HTTP_200_OK
         ), "Expected Response Code 200, received {0} instead. (Status: {1})".format(
             response.status_code,
             application_status,
         )
 
         assert (
-            response.data.get("status") == application_status
+                response.data.get("status") == application_status
         ), "Response data does not contain `status` field with value `{0}`.".format(
             application_status,
         )
     else:
         assert (
-            response.status_code == status.HTTP_400_BAD_REQUEST
+                response.status_code == status.HTTP_400_BAD_REQUEST
         ), "Expected Response Code 400, received {0} instead. (Status: {1})".format(
             response.status_code,
             application_status,
@@ -153,8 +183,8 @@ notes_cases = (
 
 
 @pytest.mark.parametrize("notes", notes_cases)
-def test_applications_notes(user, notes):
-    application = Application.objects.create(user=user)
+def test_applications_notes(super_user, notes):
+    application = Application.objects.create(user=super_user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -167,21 +197,21 @@ def test_applications_notes(user, notes):
         {"notes": notes},
         format="json",
     )
-    force_authenticate(request, user=user)
+    force_authenticate(request, user=super_user)
     response = view(request, pk=application.id)
 
     assert (
-        response.status_code == status.HTTP_200_OK
+            response.status_code == status.HTTP_200_OK
     ), "Expected Response Code 200, received {0} instead.".format(
         response.status_code,
     )
 
     assert (
-        response.data.get("notes") == notes
+            response.data.get("notes") == notes
     ), "Response data does not contain `notes` field with value `some notes`."
 
 
-def test_applications_list(user):
+def test_applications_list(super_user):
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -190,11 +220,11 @@ def test_applications_list(user):
     )
 
     request = factory.get(APPLICATIONS_V1_URI)
-    force_authenticate(request, user=user)
+    force_authenticate(request, user=super_user)
     response = view(request)
 
     assert (
-        response.status_code == status.HTTP_200_OK
+            response.status_code == status.HTTP_200_OK
     ), "Expected Response Code 200, received {0} instead.".format(
         response.status_code,
     )
