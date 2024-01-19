@@ -1,6 +1,6 @@
 ### Job Trackers
 
-#### Introduction
+## Introduction
 
 This Readme provides detailed instructions for building, running, and testing a Docker-based application. It uses Docker
 Compose for managing containerized services.
@@ -15,9 +15,9 @@ Compose for managing containerized services.
 - [Code Quality Tools](#code-quality-tools)
 - [Building and Starting the Application in One Command](#building-and-starting-the-application-in-one-command)
 
-#### Possible improvements and future work
+## Possible improvements and future work
 
-##### Functional improvements
+### Functional improvements
 
 - Implement authorization endpoints
 - Add vacancy functionality and link applications to vacancies
@@ -29,7 +29,7 @@ Compose for managing containerized services.
 - Add additional Django groups with fields (e.g. HR, Candidates, etc.) to allow user tack his own applications (in case
   of candidates) or applications of his vacancies (in case of HR)
 
-##### Technical improvements
+### Technical improvements
 
 - Refactor all tests to use client instead of using view directly (delivers better integration testing)
 - Select test's code blocks that can be moved to separate functions or fixtures
@@ -40,12 +40,12 @@ Compose for managing containerized services.
     - It is generated automatically based on the code
     - Documentation is near the code and is always up to date (no need to maintain separate documentation)
 
-#### Prerequisites
+## Prerequisites
 
 - Docker and Docker Compose installed on your system.
 - Basic understanding of Docker and command-line interface usage.
 
-#### Steps to Build and Run the Application
+## Steps to Build and Run the Application
 
 1. **Building Docker Images**
     - Command: `make build`
@@ -73,20 +73,20 @@ Compose for managing containerized services.
     - This command tails the logs of all running containers.
     - Expected output: Continuous stream of log outputs from the containers.
 
-#### Running Migrations
+## Running Migrations
 
 - Command: `make migrate`
 - This runs the database migrations inside the Docker container.
 - Note: The database container keeps running after migrations. Use `make down` to stop it.
 
-#### Testing the Application
+## Testing the Application
 
 1. **Running Tests**
     - Command: `make test`
     - This runs the application tests using pytest inside the Docker container.
     - Expected output: Test results showing the number of tests passed/failed.
 
-#### Code Quality Tools
+## Code Quality Tools
 
 1. **Formatting Code**
     - Command: `make format`
@@ -104,7 +104,7 @@ Compose for managing containerized services.
     - Command: `make scan`
     - This runs linting, type-checking, and tests all together.
 
-#### Building and Starting the Application in One Command
+## Building and Starting the Application in One Command
 
 - Command: `make build-up`
 - This will build the Docker images and then start the Docker containers.
