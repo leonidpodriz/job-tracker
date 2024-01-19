@@ -1,5 +1,6 @@
 import pytest
 from rest_framework import status
+from rest_framework.reverse import reverse
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from applications.models import Application
@@ -8,31 +9,25 @@ from applications.views import ApplicationViewSet
 APPLICATIONS_V1_URI = "/api/v1/applications/"
 
 
-def test_unauthorized_requests():
-    factory = APIRequestFactory()
-    view = ApplicationViewSet.as_view(
-        {
-            "get": "retrieve",
-            "put": "update",
-            "patch": "partial_update",
-            "delete": "destroy",
-        }
-    )
-
-    requests = [
-        factory.get(APPLICATIONS_V1_URI),
-        factory.put(APPLICATIONS_V1_URI),
-        factory.patch(APPLICATIONS_V1_URI),
-        factory.delete(APPLICATIONS_V1_URI),
+@pytest.mark.django_db
+def test_unauthorized_requests(client, user):
+    application = Application.objects.create(user=user)
+    method_requests = [
+        (client.get, reverse("applications:applications-list")),
+        (client.post, reverse("applications:applications-list")),
+        (client.get, reverse("applications:applications-detail", args=[application.id])),
+        (client.put, reverse("applications:applications-detail", args=[application.id])),
+        (client.patch, reverse("applications:applications-detail", args=[application.id])),
+        (client.delete, reverse("applications:applications-detail", args=[application.id])),
     ]
 
-    for request in requests:
-        response = view(request)
+    for method, uri in method_requests:
+        response = method(uri)
 
         assert (
                 response.status_code == status.HTTP_401_UNAUTHORIZED
         ), "Expected Response Code 401, received {0} instead. (Method: {1})".format(
-            response.status_code, request.method
+            response.status_code, method.__name__
         )
 
 
