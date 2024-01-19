@@ -41,6 +41,12 @@ type-check:
 
 scan: lint type-check test
 
+# CI check is selected to separate task in order to run it one command that reduces time and costs of CI
+ci-checks:
+	@echo "Running CI checks..."
+	@docker compose  -f docker/compose-base.yml run --rm app /bin/bash -c "pytest && python -m flake8 . && mypy ."
+
+
 build-up: build up
 
 .PHONY: build up down restart logs migrate build-up test format lint type-check scan
