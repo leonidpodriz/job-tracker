@@ -9,10 +9,14 @@ from applications.views import ApplicationViewSet
 APPLICATIONS_V1_URI = "/api/v1/applications/"
 
 
-@pytest.mark.django_db
-def test_unauthorized_requests(client, user):
-    application = Application.objects.create(user=user)
-    method_requests = [
+@pytest.fixture
+def application(user):
+    return Application.objects.create(user=user)
+
+
+@pytest.fixture
+def application_method_requests(application, client):
+    return [
         (client.get, reverse("applications:applications-list")),
         (client.post, reverse("applications:applications-list")),
         (client.get, reverse("applications:applications-detail", args=[application.id])),
@@ -21,7 +25,10 @@ def test_unauthorized_requests(client, user):
         (client.delete, reverse("applications:applications-detail", args=[application.id])),
     ]
 
-    for method, uri in method_requests:
+
+@pytest.mark.django_db
+def test_unauthorized_requests(user, application_method_requests):
+    for method, uri in application_method_requests:
         response = method(uri)
 
         assert (
@@ -31,33 +38,16 @@ def test_unauthorized_requests(client, user):
         )
 
 
-def test_applications_operations_without_permissions(user):
-    application = Application.objects.create(user=user)
-    factory = APIRequestFactory()
-    view = ApplicationViewSet.as_view(
-        {
-            "get": "retrieve",
-            "put": "update",
-            "patch": "partial_update",
-            "delete": "destroy",
-        }
-    )
+def test_applications_operations_without_permissions(user, client, application_method_requests):
+    client.force_login(user)
 
-    requests = [
-        factory.get(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
-        factory.put(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
-        factory.patch(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
-        factory.delete(APPLICATIONS_V1_URI + "{0}/".format(application.id)),
-    ]
-
-    for request in requests:
-        force_authenticate(request, user=user)
-        response = view(request, pk=application.id)
+    for method, uri in application_method_requests:
+        response = method(uri)
 
         assert (
                 response.status_code == status.HTTP_403_FORBIDDEN
         ), "Expected Response Code 403, received {0} instead. (Method: {1})".format(
-            response.status_code, request.method
+            response.status_code, method
         )
 
 
