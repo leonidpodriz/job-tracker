@@ -35,6 +35,20 @@ def has_user_protected_field_permission(user: AbstractUser, obj: models.Model, f
     return user.has_perm(get_field_permission(obj, field_name)[0])
 
 
+def get_serializer(view: APIView) -> serializers.Serializer:
+    get_serializer_method = getattr(view, "get_serializer", None)
+
+    if get_serializer_method is None:
+        raise ValueError("View does not have a get_serializer method")
+
+    serializer = get_serializer_method()
+
+    if not isinstance(serializer, serializers.Serializer):
+        raise ValueError("View's get_serializer method did not return a Serializer")
+
+    return serializer
+
+
 class GeneralObjectPermission(DjangoObjectPermissions):
     perms_map = {
         **DjangoObjectPermissions.perms_map,
@@ -51,7 +65,7 @@ class GeneralObjectPermission(DjangoObjectPermissions):
         if not has_permission:
             return False
 
-        serializer = self.get_serializer(view)
+        serializer = get_serializer(view)
         user = request.user
 
         if not isinstance(user, AbstractUser):
@@ -67,17 +81,3 @@ class GeneralObjectPermission(DjangoObjectPermissions):
                 return False
 
         return True
-
-    @classmethod
-    def get_serializer(cls, view: APIView) -> serializers.Serializer:
-        get_serializer = getattr(view, "get_serializer", None)
-
-        if get_serializer is None:
-            raise ValueError("View does not have a get_serializer method")
-
-        serializer = get_serializer()
-
-        if not isinstance(serializer, serializers.Serializer):
-            raise ValueError("View's get_serializer method did not return a Serializer")
-
-        return serializer
