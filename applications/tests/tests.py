@@ -19,10 +19,22 @@ def application_method_requests(application, client):
     return [
         (client.get, reverse("applications:applications-list")),
         (client.post, reverse("applications:applications-list")),
-        (client.get, reverse("applications:applications-detail", args=[application.id])),
-        (client.put, reverse("applications:applications-detail", args=[application.id])),
-        (client.patch, reverse("applications:applications-detail", args=[application.id])),
-        (client.delete, reverse("applications:applications-detail", args=[application.id])),
+        (
+            client.get,
+            reverse("applications:applications-detail", args=[application.id]),
+        ),
+        (
+            client.put,
+            reverse("applications:applications-detail", args=[application.id]),
+        ),
+        (
+            client.patch,
+            reverse("applications:applications-detail", args=[application.id]),
+        ),
+        (
+            client.delete,
+            reverse("applications:applications-detail", args=[application.id]),
+        ),
     ]
 
 
@@ -32,20 +44,22 @@ def test_unauthorized_requests(user, application_method_requests):
         response = method(uri)
 
         assert (
-                response.status_code == status.HTTP_401_UNAUTHORIZED
+            response.status_code == status.HTTP_401_UNAUTHORIZED
         ), "Expected Response Code 401, received {0} instead. (Method: {1})".format(
             response.status_code, method.__name__
         )
 
 
-def test_applications_operations_without_permissions(user, client, application_method_requests):
+def test_applications_operations_without_permissions(
+    user, client, application_method_requests
+):
     client.force_login(user)
 
     for method, uri in application_method_requests:
         response = method(uri)
 
         assert (
-                response.status_code == status.HTTP_403_FORBIDDEN
+            response.status_code == status.HTTP_403_FORBIDDEN
         ), "Expected Response Code 403, received {0} instead. (Method: {1})".format(
             response.status_code, method
         )
@@ -64,7 +78,7 @@ def test_applications_create(admin_user):
     response = view(request)
 
     assert (
-            response.status_code == status.HTTP_201_CREATED
+        response.status_code == status.HTTP_201_CREATED
     ), "Expected Response Code 201, received {0} instead.".format(
         response.status_code,
     )
@@ -72,11 +86,11 @@ def test_applications_create(admin_user):
     assert "id" in response.data, "Response data does not contain `id` field."
 
     assert (
-            response.data.get("status") == "pending"
+        response.data.get("status") == "pending"
     ), "Response data does not contain `status` field with value `pending`."
 
     assert (
-            response.data.get("user", {}).get("id") == admin_user.id
+        response.data.get("user", {}).get("id") == admin_user.id
     ), "Response data does not contain `user` field with correct `id`."
 
     required_user_fields = {"username", "first_name", "last_name", "email", "is_active"}
@@ -137,20 +151,20 @@ def test_applications_status_change(admin_user, status_case):
 
     if is_valid_expected:
         assert (
-                response.status_code == status.HTTP_200_OK
+            response.status_code == status.HTTP_200_OK
         ), "Expected Response Code 200, received {0} instead. (Status: {1})".format(
             response.status_code,
             application_status,
         )
 
         assert (
-                response.data.get("status") == application_status
+            response.data.get("status") == application_status
         ), "Response data does not contain `status` field with value `{0}`.".format(
             application_status,
         )
     else:
         assert (
-                response.status_code == status.HTTP_400_BAD_REQUEST
+            response.status_code == status.HTTP_400_BAD_REQUEST
         ), "Expected Response Code 400, received {0} instead. (Status: {1})".format(
             response.status_code,
             application_status,
@@ -186,13 +200,13 @@ def test_applications_notes(admin_user, notes):
     response = view(request, pk=application.id)
 
     assert (
-            response.status_code == status.HTTP_200_OK
+        response.status_code == status.HTTP_200_OK
     ), "Expected Response Code 200, received {0} instead.".format(
         response.status_code,
     )
 
     assert (
-            response.data.get("notes") == notes
+        response.data.get("notes") == notes
     ), "Response data does not contain `notes` field with value `some notes`."
 
 
@@ -209,7 +223,7 @@ def test_applications_list(admin_user):
     response = view(request)
 
     assert (
-            response.status_code == status.HTTP_200_OK
+        response.status_code == status.HTTP_200_OK
     ), "Expected Response Code 200, received {0} instead.".format(
         response.status_code,
     )

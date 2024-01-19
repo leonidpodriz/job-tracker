@@ -1,3 +1,5 @@
+import typing
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import options
@@ -15,11 +17,14 @@ def get_field_permission(model_cls: models.Model, field_name: str) -> tuple[str,
     """
     meta = get_model_options(model_cls)
 
-    return FIELD_PERMISSION_FORMAT.format(
-        app_label=meta.app_label,
-        model_name=meta.model_name,
-        field_name=field_name,
-    ), f"Can change {meta.model_name} {field_name}"
+    return (
+        FIELD_PERMISSION_FORMAT.format(
+            app_label=meta.app_label,
+            model_name=meta.model_name,
+            field_name=field_name,
+        ),
+        f"Can change {meta.model_name} {field_name}",
+    )
 
 
 def get_model_options(model_cls: models.Model) -> options.Options:
@@ -31,7 +36,9 @@ def get_model_options(model_cls: models.Model) -> options.Options:
     return meta
 
 
-def has_user_protected_field_permission(user: AbstractUser, obj: models.Model, field_name: str) -> bool:
+def has_user_protected_field_permission(
+    user: AbstractUser, obj: models.Model, field_name: str
+) -> bool:
     return user.has_perm(get_field_permission(obj, field_name)[0])
 
 
@@ -52,14 +59,14 @@ def get_serializer(view: APIView) -> serializers.Serializer:
 class GeneralObjectPermission(DjangoObjectPermissions):
     perms_map = {
         **DjangoObjectPermissions.perms_map,
-        'GET': ['%(app_label)s.view_%(model_name)s'],
+        "GET": ["%(app_label)s.view_%(model_name)s"],
     }
 
-    protected_fields = tuple()
+    protected_fields: typing.Iterable[str] = tuple()
     _update_methods = ("PATCH", "PUT")
     _create_methods = ("POST",)
 
-    def has_object_permission(self, request: Request, view: APIView, obj: any):
+    def has_object_permission(self, request: Request, view: APIView, obj: typing.Any):
         has_permission = super().has_object_permission(request, view, obj)
 
         if not has_permission:
@@ -77,7 +84,14 @@ class GeneralObjectPermission(DjangoObjectPermissions):
                 continue
 
             field_name = serializer_field.source_attrs[-1]
-            if field_name in self.protected_fields and not has_user_protected_field_permission(user, obj, field_name):
+            is_protected_field = self.is_protected_field(field_name)
+
+            if is_protected_field and not has_user_protected_field_permission(
+                user, obj, field_name
+            ):
                 return False
 
         return True
+
+    def is_protected_field(self, field_name: str) -> bool:
+        return field_name in self.protected_fields
