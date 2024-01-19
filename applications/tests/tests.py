@@ -36,8 +36,8 @@ def test_unauthorized_requests():
         )
 
 
-def test_applications_operations_without_permissions(pure_user):
-    application = Application.objects.create(user=pure_user)
+def test_applications_operations_without_permissions(user):
+    application = Application.objects.create(user=user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -56,7 +56,7 @@ def test_applications_operations_without_permissions(pure_user):
     ]
 
     for request in requests:
-        force_authenticate(request, user=pure_user)
+        force_authenticate(request, user=user)
         response = view(request, pk=application.id)
 
         assert (
@@ -66,7 +66,7 @@ def test_applications_operations_without_permissions(pure_user):
         )
 
 
-def test_applications_create(super_user):
+def test_applications_create(admin_user):
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -75,7 +75,7 @@ def test_applications_create(super_user):
     )
 
     request = factory.post(APPLICATIONS_V1_URI, {}, format="json")
-    force_authenticate(request, user=super_user)
+    force_authenticate(request, user=admin_user)
     response = view(request)
 
     assert (
@@ -91,7 +91,7 @@ def test_applications_create(super_user):
     ), "Response data does not contain `status` field with value `pending`."
 
     assert (
-            response.data.get("user", {}).get("id") == super_user.id
+            response.data.get("user", {}).get("id") == admin_user.id
     ), "Response data does not contain `user` field with correct `id`."
 
     required_user_fields = {"username", "first_name", "last_name", "email", "is_active"}
@@ -130,8 +130,8 @@ status_cases = (
 
 
 @pytest.mark.parametrize("status_case", status_cases)
-def test_applications_status_change(super_user, status_case):
-    application = Application.objects.create(user=super_user)
+def test_applications_status_change(admin_user, status_case):
+    application = Application.objects.create(user=admin_user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -147,7 +147,7 @@ def test_applications_status_change(super_user, status_case):
         {"status": application_status},
         format="json",
     )
-    force_authenticate(request, user=super_user)
+    force_authenticate(request, user=admin_user)
     response = view(request, pk=application.id)
 
     if is_valid_expected:
@@ -183,8 +183,8 @@ notes_cases = (
 
 
 @pytest.mark.parametrize("notes", notes_cases)
-def test_applications_notes(super_user, notes):
-    application = Application.objects.create(user=super_user)
+def test_applications_notes(admin_user, notes):
+    application = Application.objects.create(user=admin_user)
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -197,7 +197,7 @@ def test_applications_notes(super_user, notes):
         {"notes": notes},
         format="json",
     )
-    force_authenticate(request, user=super_user)
+    force_authenticate(request, user=admin_user)
     response = view(request, pk=application.id)
 
     assert (
@@ -211,7 +211,7 @@ def test_applications_notes(super_user, notes):
     ), "Response data does not contain `notes` field with value `some notes`."
 
 
-def test_applications_list(super_user):
+def test_applications_list(admin_user):
     factory = APIRequestFactory()
     view = ApplicationViewSet.as_view(
         {
@@ -220,7 +220,7 @@ def test_applications_list(super_user):
     )
 
     request = factory.get(APPLICATIONS_V1_URI)
-    force_authenticate(request, user=super_user)
+    force_authenticate(request, user=admin_user)
     response = view(request)
 
     assert (
