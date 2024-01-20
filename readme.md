@@ -1,5 +1,7 @@
 ### Job Trackers
 
+[![Django CI](https://github.com/leonidpodriz/job-tracker/actions/workflows/django.yml/badge.svg)](https://github.com/leonidpodriz/job-tracker/actions/workflows/django.yml)
+
 ## Introduction
 
 This Readme provides detailed instructions for building, running, and testing a Docker-based application. It uses Docker
