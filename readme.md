@@ -27,7 +27,7 @@ future work that can be done to make this application more useful and user-frien
 - Implement authorization endpoints
 - Add vacancy functionality and link applications to vacancies
 - Make notes foreign model to applications to allow multiple notes per application with different authors, timestamps
-  and attachments
+  and attachments. Technical remark: it also fits better to Django permission system and provides more flexibility
 - Add files (e.g. CVs) to applications
 - Add tags to applications
 - Add email notifications once application status changes
