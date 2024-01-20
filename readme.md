@@ -19,6 +19,9 @@ Compose for managing containerized services.
 
 ## Possible improvements and future work
 
+I was limited by the time and decided to focus on the core functionality. There are a lot of possible improvements and
+future work that can be done to make this application more useful and user-friendly. I will list some of them below.
+
 ### Functional improvements
 
 - Implement authorization endpoints
@@ -111,3 +114,10 @@ Compose for managing containerized services.
 - Command: `make build-up`
 - This will build the Docker images and then start the Docker containers.
 - Note: Don't forget to run migrations before starting the application with command `make migrate`.
+
+## LLMs usage
+
+I haven't used large language models (LLMs) to generate code exceeding 10 lines of code, as I prefer to test my own
+skills. However, I've utilized GitHub Copilot to enhance my code completion experience and to handle some templated
+parts of the code. Additionally, I've employed ChatGPT for generating build and run instructions in this file. The
+Makefile is sufficiently self-explanatory.
