@@ -20,6 +20,7 @@ pip = "*"
 install = "*"
 django-stubs = {extras = ["compatible-mypy"], version = "*"}
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
+pytest-metadata = "*"
 
 [requires]
 python_version = "3.12"
