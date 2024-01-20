@@ -119,5 +119,5 @@ future work that can be done to make this application more useful and user-frien
 
 I haven't used large language models (LLMs) to generate code exceeding 10 lines of code, as I prefer to test my own
 skills. However, I've utilized GitHub Copilot to enhance my code completion experience and to handle some templated
-parts of the code. Additionally, I've employed ChatGPT for generating build and run instructions in this file. The
-Makefile is sufficiently self-explanatory.
+parts of the code. Additionally, I've employed ChatGPT for generating build and run instructions (I've review it and add
+some additional information) in this file. The Makefile is sufficiently self-explanatory.
